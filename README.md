@@ -4,6 +4,8 @@ This repository is a living portfolio designed to show hiring managers in capita
 
 ![Equity Research Dashboard Showcase](./media/app_showcase.mov)
 
+![Equity Research Dashboard Main Screen](./media/app_main_screen.png)
+
 Every project here pulls live market data, performs real calculations, and produces professional-quality output. These aren't homework assignments or static scripts. They're tools that demonstrate the analytical thinking, technical execution, and financial fluency that entry-level finance roles demand.
 
 ---
