@@ -1,0 +1,90 @@
+---
+title: 'Project Tutorial: Equity Research Dashboard in R'
+author: "Drew Galvin"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# Project Overview
+This project is a high-level **Equity Research Dashboard** built using the `Shiny` framework. It is designed for entry-level roles in finance, such as Investment Research or Capital Markets, to demonstrate technical proficiency in financial modeling and data automation.
+
+## Key Features
+* **Live Data Integration**: Uses `quantmod` and `tidyquant` to pull real-time market data from Yahoo Finance.
+* **DCF Valuation**: Includes a 5-year Discounted Cash Flow (DCF) model with adjustable assumptions for revenue growth and WACC.
+* **Sensitivity Analysis**: A heatmap visualizing how valuation changes based on different cost-of-capital and growth scenarios.
+* **Comparables (Comps)**: A module to compare P/E ratios and Market Caps across peer companies.
+
+---
+## Legend
+* **Ticker Selection**: Enter a symbol (e.g., AAPL) in the sidebar to fetch historical prices.
+
+* **Adjust Assumptions**: Modify the WACC or Revenue Growth sliders to see real-time updates to the target price.
+
+* **Analyze Technicals**: Use the "Price & Overview" tab to view 50-day and 200-day Moving Averages.
+
+* **Generate Summary**: Use the "Research Summary" tab to produce a text-based investment thesis.
+
+
+# Project Overview
+This project is a high-level **Equity Research Dashboard** built using the `Shiny` framework. It is designed for entry-level roles in finance, such as Investment Research or Capital Markets, to demonstrate technical proficiency in financial modeling and data automation.
+
+## Key Features
+* **Live Data Integration**: Uses `quantmod` and `tidyquant` to pull real-time market data from Yahoo Finance.
+* **DCF Valuation**: Includes a 5-year Discounted Cash Flow (DCF) model with adjustable assumptions for revenue growth and EBITDA margins.
+* **Sensitivity Analysis**: A heatmap visualizing how valuation changes based on different cost-of-capital (WACC) and terminal growth scenarios.
+* **Comparables (Comps)**: A module to compare P/E ratios and Market Caps across peer companies.
+
+---
+
+# User Guide: Master the Sliders
+The dashboard uses interactive sliders to drive a **Discounted Cash Flow (DCF)** model. Here is how to use them and how they affect the intrinsic value calculation.
+
+## 1. DCF Assumptions: The "Cash Flow" Engine
+These sliders determine your **Free Cash Flow (FCF)**—the actual cash a company generates after all operational and capital expenses.
+
+* **Revenue Growth Rate**:
+    * **What it is**: Your estimate of annual sales growth over the projection period.
+    * **Impact**: **Higher growth = Higher valuation.** This is often the most sensitive input in the top-line model.
+* **EBITDA Margin**:
+    * **What it is**: Earnings before interest, taxes, depreciation, and amortization as a percentage of revenue.
+    * **Impact**: **Higher margin = Higher cash flow.** It represents the operational efficiency of the business.
+* **CapEx (% of Revenue)**:
+    * **What it is**: The percentage of revenue reinvested into physical assets (Property, Plant, & Equipment).
+    * **Impact**: **Higher CapEx = Lower valuation.** CapEx is a "cash outflow" that reduces the cash available to shareholders.
+
+
+
+## 2. Discount & Terminal: The "Risk" Engine
+These sliders tell the model how much future cash is worth in today's dollars.
+
+* **WACC (Weighted Average Cost of Capital)**:
+    * **What it is**: The discount rate representing the company's total cost of financing (debt + equity).
+    * **Impact**: **Higher WACC = Lower Valuation.** A higher WACC means the company is perceived as riskier.
+* **Terminal Growth Rate**:
+    * **What it is**: The rate at which the company is expected to grow *perpetually* after the 5-year projection.
+    * **The Rule**: This should generally be aligned with long-term GDP growth (usually **2% to 3%**).
+
+## 3. Capital Structure: From Enterprise to Equity
+* **Shares Outstanding**: The total number of shares used to calculate the price per share.
+* **Net Debt**: Calculated as `Total Debt - Cash`. Higher debt reduces the value available to equity holders (shareholders).
+
+
+
+---
+
+# The Valuation Logic
+Below is the core R logic used in the dashboard to calculate the **Intrinsic Value**.
+
+```{r dcf_logic, eval=FALSE}
+# Projecting Free Cash Flows
+fcf <- ebitda - taxes - capex - nwc_changes
+
+# Terminal Value Calculation (Gordon Growth)
+terminal_value <- terminal_fcf / (wacc - terminal_growth)
+
+# Enterprise Value to Price Per Share
+enterprise_value <- sum(pv_fcf) + pv_terminal
+equity_value <- enterprise_value - net_debt
+price_per_share <- equity_value / shares_outstanding
