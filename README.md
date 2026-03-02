@@ -1,4 +1,4 @@
-# Drew Portfolio
+# Drew's Portfolio
 
 This repository is a living portfolio designed to show hiring managers in capital markets, wealth management, investment research, and financial analysis that I can do the work — not just talk about it.
 
