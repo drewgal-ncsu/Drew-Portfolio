@@ -2,7 +2,7 @@
 
 This repository is a living portfolio designed to show hiring managers in capital markets, wealth management, investment research, and financial analysis that I can do the work — not just talk about it.
 
-![Equity Research Dashboard Showcase](./media/app_showcase.webp)
+![Equity Research Dashboard Showcase](./media/app_showcase.mov)
 
 Every project here pulls live market data, performs real calculations, and produces professional-quality output. These aren't homework assignments or static scripts. They're tools that demonstrate the analytical thinking, technical execution, and financial fluency that entry-level finance roles demand.
 
