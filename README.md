@@ -5,7 +5,8 @@ Welcome to my professional portfolio. I am a finance-focused developer building 
 ---
 
 ## 🚀 Live Demo: Equity Research Dashboard
-**Deployment in progress — live link coming soon.**
+**Try the live app, no installation required:**
+### 👉 [Launch Live Dashboard](https://drewgal-ncsu.shinyapps.io/equityresearchshiny/)
 
 ---
 

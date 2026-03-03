@@ -3,37 +3,37 @@
 # A Shiny-based equity analysis tool for DCF valuation, comparable company
 # analysis, and automated research summary generation.
 #
-# Author: Drew Galvin
-# GitHub: github.com/drewgalvin/equity-research-dashboard
-# Live App: https://drewgalvin.shinyapps.io/equity-research-dashboard/
+# Author: Drew [Last Name]
+# GitHub: github.com/[username]/equity-research-dashboard
 # ============================================================================
-
-# Required packages for a Finance Micro-SaaS
+# List of required packages for a Finance Micro-SaaS
 pkgs <- c(
   "shiny", "shinydashboard", "quantmod", "tidyverse",
   "plotly", "DT", "scales", "glue"
 )
 
-# Helper function to install missing packages on local environments
-if (requireNamespace("utils", quietly = TRUE)) {
-  missing_pkgs <- setdiff(pkgs, rownames(installed.packages()))
-  if (length(missing_pkgs) > 0) {
-    install.packages(missing_pkgs, repos = "https://cran.rstudio.com/")
-  }
-}
-
-# Load standard Shiny libraries
+# Install any missing packages
+install.packages(setdiff(pkgs, rownames(installed.packages()))) 
+install.packages("shiny")
+install.packages("shinydashboard")
 library(shiny)
 library(shinydashboard)
 
-# Verify and load all dependencies for deployment
-invisible(lapply(pkgs, library, character.only = TRUE))
+# Verify by loading them all
+lapply(pkgs, library, character.only = TRUE)
+library(shiny)
+library(shinydashboard)
+library(quantmod)
+library(tidyverse)
+library(plotly)
+library(DT)
+library(scales)
+library(glue)
 
 # Prevent tidyverse NSE variable bindings from triggering IDE warnings
 WACC <- Terminal_Growth <- Price <- NULL
 `Market Cap` <- `P/E` <- Volume <- NULL
 Year <- Revenue <- `Free Cash Flow` <- `Discount Factor` <- Ticker <- NULL
-
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
@@ -92,28 +92,28 @@ run_dcf <- function(current_revenue, revenue_growth, ebitda_margin,
   taxes <- ebitda * tax_rate
   capex <- revenues * capex_pct
   nwc_changes <- revenues * nwc_change_pct
-
+  
   # Unlevered Free Cash Flow
   fcf <- ebitda - taxes - capex - nwc_changes
-
+  
   # Terminal Value (Gordon Growth Model)
   terminal_fcf <- fcf[projection_years] * (1 + terminal_growth)
   terminal_value <- terminal_fcf / (wacc - terminal_growth)
-
+  
   # Discount factors
   discount_factors <- 1 / (1 + wacc)^years
   terminal_discount <- 1 / (1 + wacc)^projection_years
-
+  
   # Present values
   pv_fcf <- fcf * discount_factors
   pv_terminal <- terminal_value * terminal_discount
-
+  
   # Enterprise & Equity Value
-
+  
   enterprise_value <- sum(pv_fcf) + pv_terminal
   equity_value <- enterprise_value - net_debt
   price_per_share <- equity_value / shares_outstanding
-
+  
   # Build projection table
   projection_table <- tibble::tibble(
     Year = paste0("Year ", years),
@@ -123,7 +123,7 @@ run_dcf <- function(current_revenue, revenue_growth, ebitda_margin,
     `Discount Factor` = discount_factors,
     `PV of FCF` = pv_fcf
   )
-
+  
   list(
     projection_table = projection_table,
     enterprise_value = enterprise_value,
@@ -143,7 +143,7 @@ run_sensitivity <- function(current_revenue, revenue_growth, ebitda_margin,
                             shares_outstanding, net_debt) {
   wacc_range <- seq(wacc - 0.02, wacc + 0.02, by = 0.005)
   growth_range <- seq(terminal_growth - 0.01, terminal_growth + 0.01, by = 0.005)
-
+  
   # Ensure no invalid combos (wacc must be > growth)
   matrix_data <- expand.grid(WACC = wacc_range, Terminal_Growth = growth_range) |>
     dplyr::filter(.data$WACC > .data$Terminal_Growth + 0.005) |>
@@ -157,18 +157,18 @@ run_sensitivity <- function(current_revenue, revenue_growth, ebitda_margin,
       )$price_per_share
     ) |>
     dplyr::ungroup()
-
+  
   matrix_data
 }
 
 # Format currency
 fmt_currency <- function(x, prefix = "$") {
   ifelse(abs(x) >= 1e9,
-    paste0(prefix, round(x / 1e9, 2), "B"),
-    ifelse(abs(x) >= 1e6,
-      paste0(prefix, round(x / 1e6, 2), "M"),
-      paste0(prefix, comma(round(x, 2)))
-    )
+         paste0(prefix, round(x / 1e9, 2), "B"),
+         ifelse(abs(x) >= 1e6,
+                paste0(prefix, round(x / 1e6, 2), "M"),
+                paste0(prefix, comma(round(x, 2)))
+         )
   )
 }
 
@@ -186,58 +186,58 @@ ui <- dashboardPage(
   ),
   dashboardSidebar(
     width = 300,
-
+    
     # Ticker Input
     div(
       style = "padding: 15px;",
       h4(icon("search"), "Company Selection", style = "color: #ecf0f1;"),
       textInput("ticker", "Ticker Symbol", value = "AAPL", placeholder = "e.g., AAPL, MSFT, GOOG"),
       actionButton("analyze_btn", "Analyze",
-        icon = icon("magnifying-glass-chart"),
-        class = "btn-primary btn-block",
-        style = "margin-bottom: 20px;"
+                   icon = icon("magnifying-glass-chart"),
+                   class = "btn-primary btn-block",
+                   style = "margin-bottom: 20px;"
       ),
       hr(style = "border-color: #4a4a4a;"),
-
+      
       # DCF Assumptions
       h4(icon("calculator"), "DCF Assumptions", style = "color: #ecf0f1;"),
       numericInput("current_revenue", "Current Revenue ($M)",
-        value = 383000, min = 0, step = 1000
+                   value = 383000, min = 0, step = 1000
       ),
       sliderInput("revenue_growth", "Revenue Growth Rate",
-        min = -0.10, max = 0.30, value = 0.05, step = 0.01,
-        post = "%", pre = ""
+                  min = -0.10, max = 0.30, value = 0.05, step = 0.01,
+                  post = "%", pre = ""
       ),
       sliderInput("ebitda_margin", "EBITDA Margin",
-        min = 0.05, max = 0.60, value = 0.33, step = 0.01
+                  min = 0.05, max = 0.60, value = 0.33, step = 0.01
       ),
       sliderInput("tax_rate", "Effective Tax Rate",
-        min = 0.10, max = 0.35, value = 0.21, step = 0.01
+                  min = 0.10, max = 0.35, value = 0.21, step = 0.01
       ),
       sliderInput("capex_pct", "CapEx (% of Revenue)",
-        min = 0.01, max = 0.20, value = 0.04, step = 0.01
+                  min = 0.01, max = 0.20, value = 0.04, step = 0.01
       ),
       sliderInput("nwc_change", "Change in NWC (% of Revenue)",
-        min = -0.05, max = 0.10, value = 0.01, step = 0.005
+                  min = -0.05, max = 0.10, value = 0.01, step = 0.005
       ),
       hr(style = "border-color: #4a4a4a;"),
       h4(icon("sliders"), "Discount & Terminal", style = "color: #ecf0f1;"),
       sliderInput("wacc", "WACC",
-        min = 0.06, max = 0.15, value = 0.10, step = 0.005
+                  min = 0.06, max = 0.15, value = 0.10, step = 0.005
       ),
       sliderInput("terminal_growth", "Terminal Growth Rate",
-        min = 0.01, max = 0.04, value = 0.025, step = 0.005
+                  min = 0.01, max = 0.04, value = 0.025, step = 0.005
       ),
       numericInput("projection_years", "Projection Period (Years)",
-        value = 5, min = 3, max = 10, step = 1
+                   value = 5, min = 3, max = 10, step = 1
       ),
       hr(style = "border-color: #4a4a4a;"),
       h4(icon("building"), "Capital Structure", style = "color: #ecf0f1;"),
       numericInput("shares_out", "Shares Outstanding (M)",
-        value = 15500, min = 1, step = 100
+                   value = 15500, min = 1, step = 100
       ),
       numericInput("net_debt", "Net Debt ($M)",
-        value = 49000, min = -100000, step = 1000
+                   value = 49000, min = -100000, step = 1000
       )
     )
   ),
@@ -293,7 +293,7 @@ ui <- dashboardPage(
       valueBoxOutput("pe_box", width = 3),
       valueBoxOutput("target_box", width = 3)
     ),
-
+    
     # Main Content Tabs
     fluidRow(
       column(
@@ -301,7 +301,7 @@ ui <- dashboardPage(
         tabBox(
           width = 12,
           id = "main_tabs",
-
+          
           # Tab 1: Price Chart & Overview
           tabPanel(
             title = span(icon("chart-area"), " Price & Overview"),
@@ -312,8 +312,8 @@ ui <- dashboardPage(
                   width = 12, title = "Price History",
                   plotlyOutput("price_chart", height = "400px"),
                   radioButtons("chart_period", NULL,
-                    choices = c("6M" = 0.5, "1Y" = 1, "2Y" = 2, "3Y" = 3),
-                    selected = 1, inline = TRUE
+                               choices = c("6M" = 0.5, "1Y" = 1, "2Y" = 2, "3Y" = 3),
+                               selected = 1, inline = TRUE
                   )
                 )
               ),
@@ -330,7 +330,7 @@ ui <- dashboardPage(
               )
             )
           ),
-
+          
           # Tab 2: DCF Valuation
           tabPanel(
             title = span(icon("calculator"), " DCF Valuation"),
@@ -359,7 +359,7 @@ ui <- dashboardPage(
               )
             )
           ),
-
+          
           # Tab 3: Sensitivity Analysis
           tabPanel(
             title = span(icon("table"), " Sensitivity Analysis"),
@@ -377,7 +377,7 @@ ui <- dashboardPage(
               )
             )
           ),
-
+          
           # Tab 4: Comparable Company Analysis
           tabPanel(
             title = span(icon("building"), " Comparable Companies"),
@@ -387,12 +387,12 @@ ui <- dashboardPage(
                 box(
                   width = 12,
                   textInput("comps_tickers",
-                    "Enter Comparable Tickers (comma-separated)",
-                    value = "MSFT, GOOG, META, AMZN",
-                    placeholder = "e.g., MSFT, GOOG, META"
+                            "Enter Comparable Tickers (comma-separated)",
+                            value = "MSFT, GOOG, META, AMZN",
+                            placeholder = "e.g., MSFT, GOOG, META"
                   ),
                   actionButton("run_comps", "Run Comps Analysis",
-                    icon = icon("play"), class = "btn-primary"
+                               icon = icon("play"), class = "btn-primary"
                   ),
                   br(), br(),
                   DTOutput("comps_table")
@@ -416,7 +416,7 @@ ui <- dashboardPage(
               )
             )
           ),
-
+          
           # Tab 5: Research Summary
           tabPanel(
             title = span(icon("file-alt"), " Research Summary"),
@@ -424,9 +424,9 @@ ui <- dashboardPage(
               column(
                 12,
                 actionButton("generate_summary", "Generate Research Summary",
-                  icon = icon("wand-magic-sparkles"),
-                  class = "btn-primary btn-lg",
-                  style = "margin-bottom: 20px;"
+                             icon = icon("wand-magic-sparkles"),
+                             class = "btn-primary btn-lg",
+                             style = "margin-bottom: 20px;"
                 ),
                 uiOutput("research_summary")
               )
@@ -445,35 +445,35 @@ ui <- dashboardPage(
 server <- function(input, output, session) {
   # Reactive: Stock data
   stock_data <- eventReactive(input$analyze_btn,
-    {
-      withProgress(message = "Fetching market data...", {
-        ticker <- toupper(trimws(input$ticker))
-
-        # Get quote data
-        quote <- tryCatch(
-          {
-            getQuote(ticker, what = yahooQF(c("Last Trade (Price Only)", "Open", "Days High", "Days Low", "Volume", "P/E Ratio", "Market Capitalization")))
-          },
-          error = function(e) NULL
-        )
-
-        # Get historical prices
-        incProgress(0.3, detail = "Loading price history...")
-        prices <- fetch_price_history(ticker, years = 3)
-
-        # Get additional stats
-        incProgress(0.3, detail = "Calculating metrics...")
-
-        list(
-          ticker = ticker,
-          quote = quote,
-          prices = prices
-        )
-      })
-    },
-    ignoreNULL = FALSE
+                              {
+                                withProgress(message = "Fetching market data...", {
+                                  ticker <- toupper(trimws(input$ticker))
+                                  
+                                  # Get quote data
+                                  quote <- tryCatch(
+                                    {
+                                      getQuote(ticker, what = yahooQF(c("Last Trade (Price Only)", "Open", "Days High", "Days Low", "Volume", "P/E Ratio", "Market Capitalization")))
+                                    },
+                                    error = function(e) NULL
+                                  )
+                                  
+                                  # Get historical prices
+                                  incProgress(0.3, detail = "Loading price history...")
+                                  prices <- fetch_price_history(ticker, years = 3)
+                                  
+                                  # Get additional stats
+                                  incProgress(0.3, detail = "Calculating metrics...")
+                                  
+                                  list(
+                                    ticker = ticker,
+                                    quote = quote,
+                                    prices = prices
+                                  )
+                                })
+                              },
+                              ignoreNULL = FALSE
   )
-
+  
   # Reactive: DCF results
   dcf_results <- reactive({
     run_dcf(
@@ -490,9 +490,9 @@ server <- function(input, output, session) {
       net_debt = input$net_debt
     )
   })
-
+  
   # ---- VALUE BOXES ----
-
+  
   output$price_box <- renderValueBox({
     data <- stock_data()
     price <- if (!is.null(data$quote)) round(data$quote$Last, 2) else "N/A"
@@ -501,7 +501,7 @@ server <- function(input, output, session) {
       icon = icon("dollar-sign"), color = "red"
     )
   })
-
+  
   output$mcap_box <- renderValueBox({
     data <- stock_data()
     mcap <- if (!is.null(data$quote) && "Market Capitalization" %in% names(data$quote)) {
@@ -511,7 +511,7 @@ server <- function(input, output, session) {
     }
     valueBox(mcap, "Market Cap", icon = icon("building"), color = "purple")
   })
-
+  
   output$pe_box <- renderValueBox({
     data <- stock_data()
     pe <- if (!is.null(data$quote) && "P/E Ratio" %in% names(data$quote)) {
@@ -521,19 +521,19 @@ server <- function(input, output, session) {
     }
     valueBox(paste0(pe, "x"), "P/E Ratio", icon = icon("chart-pie"), color = "blue")
   })
-
+  
   output$target_box <- renderValueBox({
     dcf <- dcf_results()
     price <- dcf$price_per_share
     current <- if (!is.null(stock_data()$quote)) stock_data()$quote$Last else NA
-
+    
     upside <- if (!is.na(current) && current > 0) {
       pct <- round((price - current) / current * 100, 1)
       paste0(ifelse(pct > 0, "+", ""), pct, "%")
     } else {
       ""
     }
-
+    
     valueBox(
       paste0("$", round(price, 2)),
       paste("DCF Target", upside),
@@ -541,29 +541,29 @@ server <- function(input, output, session) {
       color = if (!is.na(current) && price > current) "green" else "red"
     )
   })
-
+  
   # ---- PRICE CHART ----
-
+  
   output$price_chart <- renderPlotly({
     data <- stock_data()
     req(data$prices)
-
+    
     period <- as.numeric(input$chart_period)
     start <- Sys.Date() - (period * 365)
-
+    
     prices <- data$prices
     prices <- prices[zoo::index(prices) >= start]
-
+    
     df <- data.frame(
       Date = zoo::index(prices),
       Close = as.numeric(Cl(prices)),
       Volume = as.numeric(Vo(prices))
     )
-
+    
     # Add moving averages
     if (nrow(df) >= 50) df$MA50 <- zoo::rollmean(df$Close, 50, fill = NA, align = "right")
     if (nrow(df) >= 200) df$MA200 <- zoo::rollmean(df$Close, 200, fill = NA, align = "right")
-
+    
     p <- plot_ly(df, x = ~Date) |>
       add_lines(
         y = ~Close, name = "Price",
@@ -581,7 +581,7 @@ server <- function(input, output, session) {
         legend = list(orientation = "h", y = -0.15),
         hovermode = "x unified"
       )
-
+    
     if ("MA50" %in% names(df)) {
       p <- p |> add_lines(
         y = ~MA50, name = "50-Day MA",
@@ -594,16 +594,16 @@ server <- function(input, output, session) {
         line = list(color = "#f39c12", width = 1, dash = "dash")
       )
     }
-
+    
     p
   })
-
+  
   # ---- KEY METRICS ----
-
+  
   output$key_metrics <- renderUI({
     data <- stock_data()
     q <- data$quote
-
+    
     metrics <- list()
     if (!is.null(q)) {
       if ("Last" %in% names(q)) metrics[["Current Price"]] <- paste0("$", round(q$Last, 2))
@@ -613,7 +613,7 @@ server <- function(input, output, session) {
       if ("Volume" %in% names(q)) metrics[["Volume"]] <- comma(q$Volume)
       if ("P/E Ratio" %in% names(q)) metrics[["P/E Ratio"]] <- round(q$`P/E Ratio`, 2)
     }
-
+    
     tags$div(
       lapply(names(metrics), function(name) {
         div(
@@ -624,18 +624,18 @@ server <- function(input, output, session) {
       })
     )
   })
-
+  
   output$ma_analysis <- renderUI({
     data <- stock_data()
     req(data$prices)
-
+    
     prices <- data$prices
     close_prices <- as.numeric(Cl(prices))
     current <- tail(close_prices, 1)
-
+    
     ma50 <- if (length(close_prices) >= 50) mean(tail(close_prices, 50)) else NA
     ma200 <- if (length(close_prices) >= 200) mean(tail(close_prices, 200)) else NA
-
+    
     tags$div(
       if (!is.na(ma50)) {
         div(
@@ -672,13 +672,13 @@ server <- function(input, output, session) {
       }
     )
   })
-
+  
   # ---- DCF VALUATION ----
-
+  
   output$fcf_chart <- renderPlotly({
     dcf <- dcf_results()
     df <- dcf$projection_table
-
+    
     plot_ly(df, x = ~Year) |>
       add_bars(
         y = ~`Free Cash Flow`, name = "FCF",
@@ -702,7 +702,7 @@ server <- function(input, output, session) {
         barmode = "group"
       )
   })
-
+  
   output$dcf_table <- renderDT({
     dcf <- dcf_results()
     df <- dcf$projection_table |>
@@ -711,32 +711,32 @@ server <- function(input, output, session) {
         ~ paste0("$", comma(round(.)))
       )) |>
       dplyr::mutate(`Discount Factor` = round(dcf$projection_table$`Discount Factor`, 4))
-
+    
     datatable(df,
-      options = list(
-        dom = "t", pageLength = 10, ordering = FALSE,
-        columnDefs = list(list(className = "dt-right", targets = 1:5))
-      ),
-      rownames = FALSE,
-      class = "cell-border stripe"
+              options = list(
+                dom = "t", pageLength = 10, ordering = FALSE,
+                columnDefs = list(list(className = "dt-right", targets = 1:5))
+              ),
+              rownames = FALSE,
+              class = "cell-border stripe"
     ) |>
       formatStyle(
         columns = names(df),
         backgroundColor = "#1a1a2e", color = "#ecf0f1"
       )
   })
-
+  
   output$dcf_summary <- renderUI({
     dcf <- dcf_results()
     current_price <- if (!is.null(stock_data()$quote)) stock_data()$quote$Last else NA
     target <- dcf$price_per_share
-
+    
     upside <- if (!is.na(current_price) && current_price > 0) {
       round((target - current_price) / current_price * 100, 1)
     } else {
       NA
     }
-
+    
     rec <- if (!is.na(upside)) {
       if (upside > 15) {
         list(text = "BUY", class = "rec-buy")
@@ -748,7 +748,7 @@ server <- function(input, output, session) {
     } else {
       list(text = "N/A", class = "rec-hold")
     }
-
+    
     tags$div(
       div(class = paste("recommendation-box", rec$class), rec$text),
       br(),
@@ -780,10 +780,10 @@ server <- function(input, output, session) {
       }
     )
   })
-
+  
   output$value_pie <- renderPlotly({
     dcf <- dcf_results()
-
+    
     plot_ly(
       labels = c("PV of Cash Flows", "PV of Terminal Value"),
       values = c(dcf$pv_fcf_total, dcf$pv_terminal),
@@ -799,9 +799,9 @@ server <- function(input, output, session) {
         showlegend = FALSE
       )
   })
-
+  
   # ---- SENSITIVITY ANALYSIS ----
-
+  
   output$sensitivity_heatmap <- renderPlotly({
     matrix_data <- run_sensitivity(
       input$current_revenue, input$revenue_growth, input$ebitda_margin,
@@ -809,7 +809,7 @@ server <- function(input, output, session) {
       input$wacc, input$terminal_growth, input$projection_years,
       input$shares_out, input$net_debt
     )
-
+    
     # Pivot for heatmap
     matrix_wide <- matrix_data |>
       dplyr::mutate(
@@ -817,7 +817,7 @@ server <- function(input, output, session) {
         Terminal_Growth = paste0(round(.data$Terminal_Growth * 100, 1), "%"),
         Price = round(.data$Price, 2)
       )
-
+    
     plot_ly(
       data = matrix_wide,
       x = ~Terminal_Growth,
@@ -837,14 +837,14 @@ server <- function(input, output, session) {
         yaxis = list(title = "WACC", gridcolor = "#2a2a3e", autorange = "reversed")
       )
   })
-
+  
   # ---- COMPARABLE COMPANIES ----
-
+  
   comps_data <- eventReactive(input$run_comps, {
     withProgress(message = "Fetching comparable data...", {
       tickers <- trimws(unlist(strsplit(input$comps_tickers, ",")))
       all_tickers <- c(toupper(trimws(input$ticker)), toupper(tickers))
-
+      
       results <- lapply(all_tickers, function(t) {
         tryCatch(
           {
@@ -862,11 +862,11 @@ server <- function(input, output, session) {
           }
         )
       })
-
+      
       dplyr::bind_rows(results) |> dplyr::filter(!is.na(.data$Price))
     })
   })
-
+  
   output$comps_table <- renderDT({
     df <- comps_data() |>
       dplyr::mutate(
@@ -875,11 +875,11 @@ server <- function(input, output, session) {
         `P/E` = paste0(.data$`P/E`, "x"),
         Volume = comma(.data$Volume)
       )
-
+    
     datatable(df,
-      options = list(dom = "t", pageLength = 20, ordering = TRUE),
-      rownames = FALSE,
-      class = "cell-border stripe"
+              options = list(dom = "t", pageLength = 20, ordering = TRUE),
+              rownames = FALSE,
+              class = "cell-border stripe"
     ) |>
       formatStyle(
         columns = names(df),
@@ -887,15 +887,15 @@ server <- function(input, output, session) {
       ) |>
       formatStyle("Ticker", fontWeight = "bold")
   })
-
+  
   output$comps_pe_chart <- renderPlotly({
     df <- comps_data() |> dplyr::filter(!is.na(.data$`P/E`))
-
+    
     colors <- ifelse(df$Ticker == toupper(input$ticker), "#e94560", "#3498db")
-
+    
     plot_ly(df,
-      x = ~Ticker, y = ~`P/E`, type = "bar",
-      marker = list(color = colors)
+            x = ~Ticker, y = ~`P/E`, type = "bar",
+            marker = list(color = colors)
     ) |>
       layout(
         paper_bgcolor = "#1a1a2e", plot_bgcolor = "#1a1a2e",
@@ -904,15 +904,15 @@ server <- function(input, output, session) {
         yaxis = list(gridcolor = "#2a2a3e", title = "P/E Ratio")
       )
   })
-
+  
   output$comps_mcap_chart <- renderPlotly({
     df <- comps_data() |> dplyr::filter(!is.na(.data$`Market Cap`))
-
+    
     colors <- ifelse(df$Ticker == toupper(input$ticker), "#e94560", "#3498db")
-
+    
     plot_ly(df,
-      x = ~Ticker, y = ~`Market Cap`, type = "bar",
-      marker = list(color = colors)
+            x = ~Ticker, y = ~`Market Cap`, type = "bar",
+            marker = list(color = colors)
     ) |>
       layout(
         paper_bgcolor = "#1a1a2e", plot_bgcolor = "#1a1a2e",
@@ -924,24 +924,24 @@ server <- function(input, output, session) {
         )
       )
   })
-
+  
   # ---- RESEARCH SUMMARY ----
-
+  
   output$research_summary <- renderUI({
     req(input$generate_summary)
-
+    
     data <- stock_data()
     dcf <- dcf_results()
     ticker <- toupper(input$ticker)
     current_price <- if (!is.null(data$quote)) round(data$quote$Last, 2) else "N/A"
     target_price <- round(dcf$price_per_share, 2)
-
+    
     upside <- if (!is.null(data$quote) && data$quote$Last > 0) {
       round((dcf$price_per_share - data$quote$Last) / data$quote$Last * 100, 1)
     } else {
       NA
     }
-
+    
     rec <- if (!is.na(upside)) {
       if (upside > 15) {
         "BUY"
@@ -953,20 +953,20 @@ server <- function(input, output, session) {
     } else {
       "N/A"
     }
-
+    
     rec_color <- switch(rec,
-      "BUY" = "#27ae60",
-      "SELL" = "#e74c3c",
-      "HOLD" = "#f39c12",
-      "#a0a0b0"
+                        "BUY" = "#27ae60",
+                        "SELL" = "#e74c3c",
+                        "HOLD" = "#f39c12",
+                        "#a0a0b0"
     )
-
+    
     pe <- if (!is.null(data$quote) && "P/E Ratio" %in% names(data$quote)) {
       round(data$quote$`P/E Ratio`, 1)
     } else {
       "N/A"
     }
-
+    
     tags$div(
       style = "max-width: 900px;",
       # Header
@@ -974,13 +974,13 @@ server <- function(input, output, session) {
         class = "summary-section",
         style = "text-align: center; border-left: none; border-top: 4px solid #e94560;",
         h2(paste0(ticker, " — Equity Research Summary"),
-          style = "color: #ecf0f1; margin: 0;"
+           style = "color: #ecf0f1; margin: 0;"
         ),
         p(paste("Generated:", format(Sys.Date(), "%B %d, %Y")),
           style = "color: #a0a0b0; margin: 5px 0 0 0;"
         )
       ),
-
+      
       # Recommendation Banner
       div(
         style = paste0(
@@ -996,7 +996,7 @@ server <- function(input, output, session) {
           )
         )
       ),
-
+      
       # Valuation Overview
       div(
         class = "summary-section",
@@ -1021,7 +1021,7 @@ server <- function(input, output, session) {
           }
         ))
       ),
-
+      
       # Key Assumptions
       div(
         class = "summary-section",
@@ -1066,7 +1066,7 @@ server <- function(input, output, session) {
           )
         )
       ),
-
+      
       # Value Composition
       div(
         class = "summary-section",
@@ -1086,7 +1086,7 @@ server <- function(input, output, session) {
           comma(input$shares_out), "M diluted shares."
         ))
       ),
-
+      
       # Risk Factors (static template)
       div(
         class = "summary-section",
@@ -1101,7 +1101,7 @@ server <- function(input, output, session) {
           tags$li("This model uses simplified assumptions and should be supplemented with industry-specific analysis")
         )
       ),
-
+      
       # Disclaimer
       div(
         style = "padding: 15px; color: #666; font-size: 11px; font-style: italic; text-align: center;",
@@ -1118,3 +1118,4 @@ server <- function(input, output, session) {
 # ============================================================================
 
 shinyApp(ui = ui, server = server)
+
