@@ -1,69 +1,60 @@
-# 📉 Financial Analysis & Analytics Portfolio
-## Drew Galvin | Financial Analyst & Fintech Developer
+# Drew Galvin | Financial Analysis & Fintech Portfolio
+[LinkedIn](https://www.linkedin.com/in/drew-galvin/) | [Live Project](https://drewgal-ncsu.shinyapps.io/equity-research/) | [GitHub](https://github.com/drewgal-ncsu)
 
-[![Live App](https://img.shields.io/badge/Live%20App-Equity%20Research%20Dashboard-blue?style=for-the-badge&logo=shiny)](https://drewgal-ncsu.shinyapps.io/equity-research/)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Drew%20Galvin-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/drew-galvin/)
-
-Welcome to my professional portfolio. I specialize in building data-driven financial tools that bridge the gap between **quantitative capital markets theory** and **technical execution**. 
+## 🎯 Professional Summary
+Entry-level Financial Analyst with a focus on **Fintech and Quantitative Analysis**. Proven capability in bridging capital markets theory with full-stack development. Specialist in automating fundamental research workflows and developing interactive valuation engines using R/Shiny.
 
 ---
 
-## 💎 Featured Project: Equity Research Dashboard
-*An enterprise-grade valuation platform engineered to automate fundamental analysis and provide real-time investment insights.*
+## 🚀 Projects & Experience
 
-### 🚀 [Launch the Live Dashboard](https://drewgal-ncsu.shinyapps.io/equity-research/)
+### **Equity Research & Valuation Dashboard**
+*Full-Stack Financial Application | R, Shiny, Quantmod, Plotly*
+[**View Live Demo**](https://drewgal-ncsu.shinyapps.io/equity-research/)
 
-#### 🎯 Why This Matters
-Institutional equity research requires speed and accuracy. This tool replaces manual Excel-based modeling with a dynamic, API-driven interface that pulls live market pricing and applies academic valuation methodologies in seconds.
-
-### 🎥 Project Showcase
-![Equity Research Dashboard Showcase](./media/app_showcase.mov)
-
----
-
-## 🛠️ Core Capabilities & Analytical Framework
-
-| Feature | Technical Implementation | Business Impact |
-|:---|:---|:---|
-| **Dynamic DCF Modeling** | 5-Year Gordon Growth / Gordon Terminal Value models. | Enables instant "What-If" analysis for intrinsic value calculations. |
-| **Live Market Data Integration** | Real-time ingestion via `quantmod` and Yahoo Finance APIs. | Eliminates manual data entry errors and ensures analysis uses the latest "last trade" pricing. |
-| **Sensitivity Modeling** | Multi-variable heatmap (WACC vs. Terminal Growth). | Visualizes valuation risk and potential margin of safety across varying macro scenarios. |
-| **Automated Summaries** | Rule-based recommendation engine (Buy/Hold/Sell logic). | Streamlines the research-to-report pipeline by generating standardized investment memos. |
-| **Comparable Analysis** | peer benchmarking against P/E and Market Cap metrics. | Provides relative valuation context alongside intrinsic value analysis. |
+**Key Achievements:**
+*   **Fundamental Valuation Engine:** Engineered a robust Discounted Cash Flow (DCF) engine using Gordon Growth and Gordon Terminal Value methodologies to calculate intrinsic share value based on user-defined growth and margin assumptions.
+*   **Automated Data Ingestion:** Developed a real-time data pipeline leveraging the `quantmod` API to ingest live market quotes, historical pricing, and key financial metadata (P/E Ratio, Market Cap) for thousands of tickers.
+*   **Advanced Risk Modeling:** Implemented a dynamic sensitivity analysis heatmap to visualize the impact of varying WACC and Terminal Growth rates on share price—a critical tool for assessing "Margin of Safety."
+*   **Interactive Peer Benchmarking:** Built a comparable company analysis (Comps) module to facilitate relative valuation by benchmarking target tickers against industry peers across multiple valuation multiples.
+*   **Report Automation:** Designed a rule-based logic engine to generate automated investment summaries and recommendations (Buy/Hold/Sell) based on calculated upsides versus current market pricing.
 
 ---
 
-## 💻 Technical Competencies
+## 🛠 Technical Skillset
 
-- **Programming:** R (`Shiny`, `Tidyverse`, `dplyr`, `tibble`)
-- **Financial Libraries:** `quantmod`, `zoo`, `scales`
-- **Visualization:** `Plotly` (interactive charts), `DT` (dynamic tables), `ggplot2`
-- **Analytics:** Internal DCF calculation engines, Moving Average Analysis (50/200 Day), and Risk/Upside modeling.
-- **Workflow:** Git/GitHub, `rsconnect` deployment, and documentation through RMarkdown.
+### **Financial Modeling & Analytics**
+*   **Intrinsic Valuation:** DCF, Sensitivity Analysis, Gordon Growth Models.
+*   **Relative Valuation:** Multiples Analysis (P/E, EV/EBITDA, Market Cap), Comparable Company Benchmarking.
+*   **Market Analysis:** Moving Average Strategy (50/200 Day), Historical Price Volatility, and Equity Benchmarking.
+
+### **Technical Tools & Languages**
+*   **Programming:** R (Highly Proficient in `Shiny`, `Tidyverse`, `dplyr`, `ggplot2`).
+*   **Data Visualization:** `Plotly` (Interactive charting), `DT` (Dynamic server-side tables).
+*   **Infrastructure:** Version Control (Git/GitHub), Deployment (rsconnect/shinyapps.io), Documentation (RMarkdown/Quarto).
 
 ---
 
-## 📂 Repository Architecture
+## 📂 Project Architecture
 
 ```text
 Drew Portfolio/
 ├── README.md                          
 └── Equity Research Dashboard Project/
-    ├── app.R                          # Full Stack Application Logic (UI & Server)
-    └── EquityReseachTutorial.Rmd      # Comprehensive Methodology & Functional Tutorial
+    ├── app.R                          # Production-grade UI & Server logic
+    └── EquityReseachTutorial.Rmd      # Documentation of financial methodology
 ```
 
 ---
 
-## 📬 Contact & Opportunities
+## 📬 Contact Information
 
-I am currently seeking opportunities in **Investment Research, Financial Analysis, or Fintech**. I am eager to apply my background in financial modeling and software development to institutional workflows.
+I am actively seeking entry-level opportunities in **Investment Research, Financial Analysis, or Fintech**. I am eager to contribute my blend of financial domain knowledge and technical execution skills to a high-performing team.
 
-- **LinkedIn:** [drew-galvin](https://www.linkedin.com/in/drew-galvin/)
-- **GitHub:** [@drewgal-ncsu](https://github.com/drewgal-ncsu)
-- **Email:** Connect via LinkedIn for direct inquiries
+*   **Email:** [Connect via LinkedIn for direct contact]
+*   **LinkedIn:** [linkedin.com/in/drew-galvin](https://www.linkedin.com/in/drew-galvin/)
 
 ---
 
 > [!IMPORTANT]
-> **Disclaimer:** This project is for demonstrative and educational purposes only. It is intended to showcase technical and analytical competency in financial software development and does not constitute financial advice.
+> **Technical Note:** This repository is intended to demonstrate technical and analytical competency. All calculations and recommendations are based on user-input assumptions and do not constitute financial advice.
