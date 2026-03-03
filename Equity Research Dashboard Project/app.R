@@ -3,18 +3,31 @@
 # A Shiny-based equity analysis tool for DCF valuation, comparable company
 # analysis, and automated research summary generation.
 #
-# Author: Drew
-# GitHub: github.com/[username]/equity-research-dashboard
+# Author: Drew Galvin
+# GitHub: github.com/drewgalvin/equity-research-dashboard
+# Live App: https://drewgalvin.shinyapps.io/equity-research-dashboard/
 # ============================================================================
 
+# Required packages for a Finance Micro-SaaS
+pkgs <- c(
+  "shiny", "shinydashboard", "quantmod", "tidyverse",
+  "plotly", "DT", "scales", "glue"
+)
+
+# Helper function to install missing packages on local environments
+if (requireNamespace("utils", quietly = TRUE)) {
+  missing_pkgs <- setdiff(pkgs, rownames(installed.packages()))
+  if (length(missing_pkgs) > 0) {
+    install.packages(missing_pkgs, repos = "https://cran.rstudio.com/")
+  }
+}
+
+# Load standard Shiny libraries
 library(shiny)
 library(shinydashboard)
-library(quantmod)
-library(tidyverse)
-library(plotly)
-library(DT)
-library(scales)
-library(glue)
+
+# Verify and load all dependencies for deployment
+invisible(lapply(pkgs, library, character.only = TRUE))
 
 # Prevent tidyverse NSE variable bindings from triggering IDE warnings
 WACC <- Terminal_Growth <- Price <- NULL
@@ -96,6 +109,7 @@ run_dcf <- function(current_revenue, revenue_growth, ebitda_margin,
   pv_terminal <- terminal_value * terminal_discount
 
   # Enterprise & Equity Value
+
   enterprise_value <- sum(pv_fcf) + pv_terminal
   equity_value <- enterprise_value - net_debt
   price_per_share <- equity_value / shares_outstanding
@@ -356,7 +370,7 @@ ui <- dashboardPage(
                   width = 12, title = "Implied Share Price: WACC vs Terminal Growth",
                   plotlyOutput("sensitivity_heatmap", height = "500px"),
                   p("Each cell shows the implied share price under different WACC and
-                                 terminal growth assumptions.",
+                                terminal growth assumptions.",
                     style = "color: #a0a0b0; font-style: italic;"
                   )
                 )

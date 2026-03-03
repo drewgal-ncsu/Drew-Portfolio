@@ -1,71 +1,70 @@
-# Drew's Portfolio
+# 📈 Drew Galvin | Finance & Analytics Portfolio
 
-This repository is a living portfolio designed to show hiring managers in capital markets, wealth management, investment research, and financial analysis that I can do the work — not just talk about it.
+Welcome to my professional portfolio. I am a finance-focused developer building tools that bridge the gap between capital markets theory and technical execution.
+
+---
+
+## 🚀 Live Demo: Equity Research Dashboard
+**Experience the tool in action:**  
+### 👉 [Launch Live Dashboard](https://drewgalvin.shinyapps.io/equity-research-dashboard/)
+
+---
+
+## 📽️ Project Showcase
+
+### Equity Research Dashboard
+An enterprise-grade analysis engine that pulls live market data, performs complex DCF valuations, and generates automated research summaries.
 
 ![Equity Research Dashboard Showcase](./media/app_showcase.mov)
 
-![Equity Research Dashboard Main Screen](./media/app_main_screen.png)
-
-Every project here pulls live market data, performs real calculations, and produces professional-quality output. These aren't homework assignments or static scripts. They're tools that demonstrate the analytical thinking, technical execution, and financial fluency that entry-level finance roles demand.
-
----
-
-## Projects
-
-### 1. Equity Research Dashboard
-**What it does:** Analysis engine with live market data, comparable company analysis, sensitivity modeling, and equity research report generation.
-
-**Skills demonstrated:** Financial modeling, equity valuation, comparable company analysis, sensitivity analysis, investment thesis construction
-
-**Key features:**
-- Real-time stock data via Yahoo Finance
-- Adjustable DCF assumptions with instant recalculation
-- WACC vs terminal growth sensitivity heatmap
-- Peer benchmarking across P/E and market cap
-- Auto-generated research summary with BUY / HOLD / SELL recommendation
+#### 🖼️ UI Preview
+![Dashboard Interface](./media/app_main_screen.png)
 
 ---
 
-### 2. Portfolio Risk Analyzer (Planned)
-**What it does:** Multi-asset portfolio construction tool with Monte Carlo simulation, Value at Risk (parametric, historical, CVaR), correlation analysis, and stress testing against historical market crashes.
+## 🛠️ Key Capabilities
 
-**Skills demonstrated:** Portfolio theory, risk management, Monte Carlo methods, statistical analysis, stress testing, performance attribution
-
----
-
-## Tech Stack
-
-| Layer | Tools |
-|-------|-------|
-| **Language** | R |
-| **Market Data** | quantmod (Yahoo Finance), FRED API |
-| **Visualization** | plotly, ggplot2 |
-| **Risk Analytics** | PerformanceAnalytics, MASS |
-| **Data Wrangling** | tidyverse, zoo, lubridate |
-| **Development** | Google Antigravity, RStudio |
+| Feature | Description |
+|:---|:---|
+| **Live Market Data** | Real-time quotes and historical pricing via **Yahoo Finance API**. |
+| **DCF Engine** | Multi-year cash flow projections with adjustable growth and margin assumptions. |
+| **Sensitivity Modeling** | Dynamic heatmap visualizing share price impact across WACC and Terminal Growth. |
+| **Comps Analysis** | Benchmark performance and valuation against industry peers (P/E, Market Cap). |
+| **Research Automation** | One-click generation of professional investment summaries and recommendations. |
 
 ---
 
-## Project Structure
+## 💻 Tech Stack
 
-```
+- **Engine:** R (`shiny`, `shinydashboard`)
+- **Data:** `quantmod`, `tidyverse`, `zoo`
+- **Visualization:** `plotly`, `ggplot2`, `DT`
+- **Analytics:** Internal DCF logic, Graham/Gordon growth models
+- **Deployment:** `shinyapps.io`, `rsconnect`
+
+---
+
+## 📂 Project Structure
+
+```text
 Drew Portfolio/
 ├── README.md                          
 └── Equity Research Dashboard Project/
-    ├── app.R
-    └── EquityReseachTutorial.Rmd
+    ├── app.R                          # Main Application Logic
+    └── EquityReseachTutorial.Rmd      # Methodology & Tutorial
 ```
 
 ---
 
-## About
+## 📬 Contact & Connect
 
-I'm an aspiring finance professional building these tools to bridge the gap between financial analysis and technology. The goal is simple: demonstrate that I don't just understand financial concepts in theory — I can build tools that apply them to real data and produce actionable insights.
+I am currently seeking opportunities in **Investment Research, Financial Analysis, or Fintech**. I'd love to discuss how these tools can be applied to institutional workflows.
 
-If you're a recruiter or hiring manager, I'd love to walk you through any of these projects in detail. Each one was designed to spark the kind of technical conversation that belongs in a finance interview.
+- **LinkedIn:** [drew-galvin](https://www.linkedin.com/in/drew-galvin/)
+- **GitHub:** [@drewgal-ncsu](https://github.com/drewgal-ncsu)
+- **Email:** [Contact via LinkedIn]
 
 ---
 
-## License
-
-MIT License — free to use, modify, and learn from.
+> [!NOTE]
+> *This documentation and the associated tools are for educational purposes. They demonstrate technical competency and are not intended as financial advice.*
