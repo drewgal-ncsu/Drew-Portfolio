@@ -3,24 +3,11 @@
 # A Shiny-based equity analysis tool for DCF valuation, comparable company
 # analysis, and automated research summary generation.
 #
-# Author: Drew [Last Name]
-# GitHub: github.com/[username]/equity-research-dashboard
+# Author: Drew Galvin
+# GitHub: github.com/drewgal-ncsu/Drew-Portfolio
+# Live App: https://drewgal-ncsu.shinyapps.io/equity-research/
 # ============================================================================
-# List of required packages for a Finance Micro-SaaS
-pkgs <- c(
-  "shiny", "shinydashboard", "quantmod", "tidyverse",
-  "plotly", "DT", "scales", "glue"
-)
 
-# Install any missing packages
-install.packages(setdiff(pkgs, rownames(installed.packages())))
-install.packages("shiny")
-install.packages("shinydashboard")
-library(shiny)
-library(shinydashboard)
-
-# Verify by loading them all
-lapply(pkgs, library, character.only = TRUE)
 library(shiny)
 library(shinydashboard)
 library(quantmod)
@@ -34,6 +21,7 @@ library(glue)
 WACC <- Terminal_Growth <- Price <- NULL
 `Market Cap` <- `P/E` <- Volume <- NULL
 Year <- Revenue <- `Free Cash Flow` <- `Discount Factor` <- Ticker <- NULL
+
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
@@ -42,6 +30,7 @@ Year <- Revenue <- `Free Cash Flow` <- `Discount Factor` <- Ticker <- NULL
 fetch_stock_data <- function(ticker) {
   tryCatch(
     {
+      # Request fields explicitly to ensure we get what we need
       getQuote(ticker, what = yahooQF(c(
         "Name", "Last Trade (Price Only)", "Market Capitalization",
         "Earnings/Share", "P/E Ratio", "Dividend Yield",
@@ -109,7 +98,6 @@ run_dcf <- function(current_revenue, revenue_growth, ebitda_margin,
   pv_terminal <- terminal_value * terminal_discount
 
   # Enterprise & Equity Value
-
   enterprise_value <- sum(pv_fcf) + pv_terminal
   equity_value <- enterprise_value - net_debt
   price_per_share <- equity_value / shares_outstanding
@@ -370,7 +358,7 @@ ui <- dashboardPage(
                   width = 12, title = "Implied Share Price: WACC vs Terminal Growth",
                   plotlyOutput("sensitivity_heatmap", height = "500px"),
                   p("Each cell shows the implied share price under different WACC and
-                                terminal growth assumptions.",
+                                 terminal growth assumptions.",
                     style = "color: #a0a0b0; font-style: italic;"
                   )
                 )
@@ -449,11 +437,13 @@ server <- function(input, output, session) {
       withProgress(message = "Fetching market data...", {
         ticker <- toupper(trimws(input$ticker))
 
-        # Get quote data — plain getQuote() returns: Last, Open, High, Low,
-        # Volume, MarketCap, PE (most reliable, live from Yahoo Finance)
+        # Get quote data (Explicitly request fields)
         quote <- tryCatch(
           {
-            getQuote(ticker)
+            getQuote(ticker, what = yahooQF(c(
+              "Last Trade (Price Only)", "Open", "Days High", "Days Low",
+              "Volume", "P/E Ratio", "Market Capitalization"
+            )))
           },
           error = function(e) NULL
         )
@@ -496,37 +486,74 @@ server <- function(input, output, session) {
 
   output$price_box <- renderValueBox({
     data <- stock_data()
-    price <- if (!is.null(data$quote)) round(data$quote$Last, 2) else "N/A"
-    valueBox(
-      paste0("$", price), "Current Price",
-      icon = icon("dollar-sign"), color = "red"
-    )
+    q <- data$quote
+    # Try multiple common names
+    price <- if (!is.null(q)) {
+      if ("Last" %in% names(q)) {
+        q$Last
+      } else if ("Last Trade (Price Only)" %in% names(q)) {
+        q$`Last Trade (Price Only)`
+      } else {
+        NA
+      }
+    } else {
+      NA
+    }
+
+    val <- if (!is.na(price)) paste0("$", round(price, 2)) else "N/A"
+    valueBox(val, "Current Price", icon = icon("dollar-sign"), color = "red")
   })
 
   output$mcap_box <- renderValueBox({
     data <- stock_data()
-    mcap <- if (!is.null(data$quote) && "MarketCap" %in% names(data$quote) && !is.na(data$quote$MarketCap)) {
-      fmt_currency(data$quote$MarketCap)
-    } else {
-      "N/A"
+    q <- data$quote
+    mcap <- "N/A"
+    if (!is.null(q)) {
+      # Try both yahooQF name and standard truncated name
+      val <- if ("Market Capitalization" %in% names(q)) {
+        q$`Market Capitalization`
+      } else if ("MarketCap" %in% names(q)) {
+        q$MarketCap
+      } else {
+        NA
+      }
+      if (!is.na(val)) mcap <- fmt_currency(val)
     }
     valueBox(mcap, "Market Cap", icon = icon("building"), color = "purple")
   })
 
   output$pe_box <- renderValueBox({
     data <- stock_data()
-    pe <- if (!is.null(data$quote) && "PE" %in% names(data$quote) && !is.na(data$quote$PE)) {
-      round(data$quote$PE, 1)
-    } else {
-      "N/A"
+    q <- data$quote
+    pe_val <- "N/A"
+    if (!is.null(q)) {
+      val <- if ("P/E Ratio" %in% names(q)) {
+        q$`P/E Ratio`
+      } else if ("PE" %in% names(q)) {
+        q$PE
+      } else {
+        NA
+      }
+      if (!is.na(val)) pe_val <- paste0(round(val, 1), "x")
     }
-    valueBox(paste0(pe, "x"), "P/E Ratio", icon = icon("chart-pie"), color = "blue")
+    valueBox(pe_val, "P/E Ratio", icon = icon("chart-pie"), color = "blue")
   })
 
   output$target_box <- renderValueBox({
     dcf <- dcf_results()
     price <- dcf$price_per_share
-    current <- if (!is.null(stock_data()$quote)) stock_data()$quote$Last else NA
+    q <- stock_data()$quote
+    current <- if (!is.null(q)) {
+      if ("Last" %in% names(q)) {
+        q$Last
+      } else if ("Last Trade (Price Only)" %in% names(q)) {
+        q$`Last Trade (Price Only)`
+      } else {
+        NA
+      }
+    } else {
+      NA
+    }
 
     upside <- if (!is.na(current) && current > 0) {
       pct <- round((price - current) / current * 100, 1)
@@ -607,12 +634,20 @@ server <- function(input, output, session) {
 
     metrics <- list()
     if (!is.null(q)) {
-      if ("Last" %in% names(q)) metrics[["Current Price"]] <- paste0("$", round(q$Last, 2))
-      if ("Open" %in% names(q)) metrics[["Open"]] <- paste0("$", round(q$Open, 2))
-      if ("High" %in% names(q)) metrics[["Day High"]] <- paste0("$", round(q$High, 2))
-      if ("Low" %in% names(q)) metrics[["Day Low"]] <- paste0("$", round(q$Low, 2))
-      if ("Volume" %in% names(q)) metrics[["Volume"]] <- comma(q$Volume)
-      if ("PE" %in% names(q) && !is.na(q$PE)) metrics[["P/E Ratio"]] <- round(q$PE, 2)
+      # Normalize names for UI
+      last <- if ("Last" %in% names(q)) q$Last else if ("Last Trade (Price Only)" %in% names(q)) q$`Last Trade (Price Only)` else NA
+      open <- if ("Open" %in% names(q)) q$Open else NA
+      high <- if ("High" %in% names(q)) q$High else if ("Days High" %in% names(q)) q$`Days High` else NA
+      low <- if ("Low" %in% names(q)) q$Low else if ("Days Low" %in% names(q)) q$`Days Low` else NA
+      vol <- if ("Volume" %in% names(q)) q$Volume else NA
+      pe <- if ("PE" %in% names(q)) q$PE else if ("P/E Ratio" %in% names(q)) q$`P/E Ratio` else NA
+
+      if (!is.na(last)) metrics[["Current Price"]] <- paste0("$", round(last, 2))
+      if (!is.na(open)) metrics[["Open"]] <- paste0("$", round(open, 2))
+      if (!is.na(high)) metrics[["Day High"]] <- paste0("$", round(high, 2))
+      if (!is.na(low)) metrics[["Day Low"]] <- paste0("$", round(low, 2))
+      if (!is.na(vol)) metrics[["Volume"]] <- comma(vol)
+      if (!is.na(pe)) metrics[["P/E Ratio"]] <- round(pe, 2)
     }
 
     tags$div(
@@ -645,7 +680,7 @@ server <- function(input, output, session) {
           div(class = "metric-value", paste0("$", round(ma50, 2))),
           div(
             style = paste0("color:", ifelse(current > ma50, "#27ae60", "#e74c3c")),
-            ifelse(current > ma50, "▲ Price Above", "▼ Price Below")
+            ifelse(current > ma50, "▲ Price Below", "▼ Price Above")
           )
         )
       },
@@ -656,7 +691,7 @@ server <- function(input, output, session) {
           div(class = "metric-value", paste0("$", round(ma200, 2))),
           div(
             style = paste0("color:", ifelse(current > ma200, "#27ae60", "#e74c3c")),
-            ifelse(current > ma200, "▲ Price Above", "▼ Price Below")
+            ifelse(current > ma200, "▲ Price Below", "▼ Price Above")
           )
         )
       },
@@ -729,7 +764,19 @@ server <- function(input, output, session) {
 
   output$dcf_summary <- renderUI({
     dcf <- dcf_results()
-    current_price <- if (!is.null(stock_data()$quote)) stock_data()$quote$Last else NA
+    q <- stock_data()$quote
+    current_price <- if (!is.null(q)) {
+      if ("Last" %in% names(q)) {
+        q$Last
+      } else if ("Last Trade (Price Only)" %in% names(q)) {
+        q$`Last Trade (Price Only)`
+      } else {
+        NA
+      }
+    } else {
+      NA
+    }
+
     target <- dcf$price_per_share
 
     upside <- if (!is.na(current_price) && current_price > 0) {
@@ -849,13 +896,19 @@ server <- function(input, output, session) {
       results <- lapply(all_tickers, function(t) {
         tryCatch(
           {
-            q <- getQuote(t)
+            q <- getQuote(t, what = yahooQF(c("Last Trade (Price Only)", "Volume", "P/E Ratio", "Market Capitalization")))
+
+            p <- if ("Last" %in% names(q)) q$Last else if ("Last Trade (Price Only)" %in% names(q)) q$`Last Trade (Price Only)` else NA
+            m <- if ("MarketCap" %in% names(q)) q$MarketCap else if ("Market Capitalization" %in% names(q)) q$`Market Capitalization` else NA
+            pe <- if ("PE" %in% names(q)) q$PE else if ("P/E Ratio" %in% names(q)) q$`P/E Ratio` else NA
+            v <- if ("Volume" %in% names(q)) q$Volume else NA
+
             tibble::tibble(
               Ticker = t,
-              Price = round(q$Last, 2),
-              `Market Cap` = if ("MarketCap" %in% names(q) && !is.na(q$MarketCap)) q$MarketCap else NA,
-              `P/E` = if ("PE" %in% names(q) && !is.na(q$PE)) round(q$PE, 1) else NA,
-              Volume = if ("Volume" %in% names(q)) q$Volume else NA
+              Price = round(p, 2),
+              `Market Cap` = m,
+              `P/E` = round(pe, 1),
+              Volume = v
             )
           },
           error = function(e) {
@@ -932,13 +985,26 @@ server <- function(input, output, session) {
     req(input$generate_summary)
 
     data <- stock_data()
+    q <- data$quote
     dcf <- dcf_results()
     ticker <- toupper(input$ticker)
-    current_price <- if (!is.null(data$quote)) round(data$quote$Last, 2) else "N/A"
+
+    current_price <- if (!is.null(q)) {
+      if ("Last" %in% names(q)) {
+        q$Last
+      } else if ("Last Trade (Price Only)" %in% names(q)) {
+        q$`Last Trade (Price Only)`
+      } else {
+        NA
+      }
+    } else {
+      NA
+    }
+
     target_price <- round(dcf$price_per_share, 2)
 
-    upside <- if (!is.null(data$quote) && data$quote$Last > 0) {
-      round((dcf$price_per_share - data$quote$Last) / data$quote$Last * 100, 1)
+    upside <- if (!is.na(current_price) && current_price > 0) {
+      round((dcf$price_per_share - current_price) / current_price * 100, 1)
     } else {
       NA
     }
@@ -962,10 +1028,16 @@ server <- function(input, output, session) {
       "#a0a0b0"
     )
 
-    pe <- if (!is.null(data$quote) && "PE" %in% names(data$quote) && !is.na(data$quote$PE)) {
-      round(data$quote$PE, 1)
+    pe <- if (!is.null(q)) {
+      if ("P/E Ratio" %in% names(q)) {
+        q$`P/E Ratio`
+      } else if ("PE" %in% names(q)) {
+        q$PE
+      } else {
+        NA
+      }
     } else {
-      "N/A"
+      NA
     }
 
     tags$div(
@@ -992,7 +1064,8 @@ server <- function(input, output, session) {
         p(
           style = "color: white; margin: 5px 0 0 0; font-size: 18px;",
           paste0(
-            "Current: $", current_price, " | Target: $", target_price,
+            "Current: $", if (!is.na(current_price)) current_price else "N/A",
+            " | Target: $", target_price,
             if (!is.na(upside)) paste0(" | Upside: ", ifelse(upside > 0, "+", ""), upside, "%") else ""
           )
         )
@@ -1015,7 +1088,7 @@ server <- function(input, output, session) {
             paste0(
               " represents a ", ifelse(upside > 0, "+", ""), upside,
               "% ", ifelse(upside > 0, "upside", "downside"),
-              " from the current market price of $", current_price, "."
+              " from the current market price of $", if (!is.na(current_price)) current_price else "N/A", "."
             )
           } else {
             "."
@@ -1088,7 +1161,7 @@ server <- function(input, output, session) {
         ))
       ),
 
-      # Risk Factors (static template)
+      # Risk Factors
       div(
         class = "summary-section",
         h4("Key Risks & Considerations"),
