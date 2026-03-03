@@ -3,24 +3,10 @@
 # A Shiny-based equity analysis tool for DCF valuation, comparable company
 # analysis, and automated research summary generation.
 #
-# Author: Drew [Last Name]
+# Author: Drew
 # GitHub: github.com/[username]/equity-research-dashboard
 # ============================================================================
-# List of required packages for a Finance Micro-SaaS
-pkgs <- c(
-  "shiny", "shinydashboard", "quantmod", "tidyverse",
-  "plotly", "DT", "scales", "glue"
-)
 
-# Install any missing packages
-install.packages(setdiff(pkgs, rownames(installed.packages())))
-install.packages("shiny")
-install.packages("shinydashboard")
-library(shiny)
-library(shinydashboard)
-
-# Verify by loading them all
-lapply(pkgs, library, character.only = TRUE)
 library(shiny)
 library(shinydashboard)
 library(quantmod)
@@ -34,6 +20,7 @@ library(glue)
 WACC <- Terminal_Growth <- Price <- NULL
 `Market Cap` <- `P/E` <- Volume <- NULL
 Year <- Revenue <- `Free Cash Flow` <- `Discount Factor` <- Ticker <- NULL
+
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
@@ -109,7 +96,6 @@ run_dcf <- function(current_revenue, revenue_growth, ebitda_margin,
   pv_terminal <- terminal_value * terminal_discount
 
   # Enterprise & Equity Value
-
   enterprise_value <- sum(pv_fcf) + pv_terminal
   equity_value <- enterprise_value - net_debt
   price_per_share <- equity_value / shares_outstanding
@@ -370,7 +356,7 @@ ui <- dashboardPage(
                   width = 12, title = "Implied Share Price: WACC vs Terminal Growth",
                   plotlyOutput("sensitivity_heatmap", height = "500px"),
                   p("Each cell shows the implied share price under different WACC and
-                                terminal growth assumptions.",
+                                 terminal growth assumptions.",
                     style = "color: #a0a0b0; font-style: italic;"
                   )
                 )

@@ -52,7 +52,7 @@ Every project here pulls live market data, performs real calculations, and produ
 Drew Portfolio/
 ├── README.md                          
 └── Equity Research Dashboard Project/
-    ├── EquityResearchapp.R
+    ├── app.R
     └── EquityReseachTutorial.Rmd
 ```
 
