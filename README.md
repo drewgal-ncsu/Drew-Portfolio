@@ -1,5 +1,5 @@
 # Drew Galvin | Financial Analysis & Fintech Portfolio
-[LinkedIn](https://www.linkedin.com/in/drew-galvin/) | [Live Project](https://drewgal-ncsu.shinyapps.io/equity-research/) | [GitHub](https://github.com/drewgal-ncsu)
+[LinkedIn](https://www.linkedin.com/in/drew-galvin/) | [Equity Research Dashboard](https://drewgal-ncsu.shinyapps.io/equity-research/) | [Portfolio Risk Analyzer](https://drewgal-ncsu.shinyapps.io/portfolio-risk-analyzer/) | [GitHub](https://github.com/drewgal-ncsu)
 
 ## Professional Summary
 Entry-level Financial Analyst with a focus on Fintech and Quantitative Analysis. Graduating from NC State University in May 2026. Proven capability in bridging capital markets theory with full-stack development, specializing in automating research workflows and developing interactive valuation engines using R/Shiny.
@@ -34,17 +34,28 @@ Entry-level Financial Analyst with a focus on Fintech and Quantitative Analysis.
 *   **Automated Data Ingestion:** Developed a real-time data pipeline leveraging the quantmod API to ingest live market quotes and financial metadata.
 *   **Advanced Risk Modeling:** Implemented a dynamic sensitivity analysis heatmap to visualize valuation risk—a critical tool for assessing "Margin of Safety."
 
-### Portfolio Risk Analyzer (Deploying Soon)
+### Portfolio Risk Analyzer
 *Risk Management Tool | R, Shiny, PerformanceAnalytics, quantmod, MASS*
+
+[**Launch Live Dashboard**](https://drewgal-ncsu.shinyapps.io/portfolio-risk-analyzer/)
 
 Multi-asset portfolio construction tool with Monte Carlo simulation, Value at Risk, and historical stress testing. The companion to the Equity Research Dashboard — one analyzes individual securities, this one manages risk across a portfolio.
 
-**Core Capabilities:**
-*   **Custom Portfolio Construction:** Build portfolios with up to 6 assets, benchmarked against SPY/VTI/QQQ.
-*   **Risk Metrics (VaR):** Three methods of Value at Risk: parametric, historical, and Conditional VaR (Expected Shortfall).
-*   **Monte Carlo Simulation:** 5,000+ correlated return simulations using the multivariate normal distribution.
-*   **Stress Testing:** Historical simulation against 6 real market crashes including COVID, GFC, and the 2022 rate shock.
-*   **Performance Attribution:** Full metrics including Sharpe, Sortino, Beta, Alpha, max drawdown, and Calmar ratio.
+**Analytical Framework & Business Impact:**
+
+| Feature | Technical Implementation | Business Impact |
+|:---|:---|:---|
+| **Custom Portfolio Construction** | Up to 6 assets with real-time weight validation, benchmarked against SPY/VTI/QQQ | Enables rapid portfolio prototyping with automatic renormalization |
+| **Value at Risk (VaR)** | Three methods: parametric (normal), historical, and Conditional VaR (Expected Shortfall) | Quantifies daily downside risk at configurable confidence levels (90–99%) |
+| **Monte Carlo Simulation** | 5,000+ correlated return paths via multivariate normal distribution (MASS::mvrnorm) | Models forward-looking portfolio outcomes using actual covariance structure |
+| **Historical Stress Testing** | Simulation against 6 real market crashes (COVID, GFC, 2022 Rate Shock, Dot-Com, Flash Crash, EU Debt) | Reveals portfolio vulnerability to tail-risk events using actual historical returns |
+| **Performance Attribution** | Full metrics: Sharpe, Sortino, Beta, Alpha, Max Drawdown, Calmar Ratio | Provides institutional-quality risk-adjusted performance evaluation |
+| **Auto-Generated Risk Report** | One-click report with risk assessment rating (LOW/MODERATE/HIGH) | Streamlines risk reporting with standardized, presentation-ready output |
+
+**Key Achievements:**
+*   **Correlated Simulation Engine:** Built a Monte Carlo engine that preserves the historical covariance structure across assets, producing realistic correlated return paths rather than independent simulations.
+*   **Full-History Stress Testing:** Engineered a separate data pipeline that fetches 25+ years of historical data specifically for stress testing, ensuring all 6 crisis scenarios produce results regardless of the analysis lookback period.
+*   **Comprehensive Risk Framework:** Implemented three independent VaR methodologies with color-coded risk classification, providing multiple perspectives on portfolio risk in a single view.
 
 ---
 
