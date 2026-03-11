@@ -39,6 +39,9 @@ Entry-level Financial Analyst with a focus on Fintech and Quantitative Analysis.
 
 [**Launch Live Dashboard**](https://drewgal-ncsu.shinyapps.io/portfolio-risk-analyzer/)
 
+#### Interface Preview
+![Dashboard Interface](./media/portfolio_analyzer_main.png)
+
 Multi-asset portfolio construction tool with Monte Carlo simulation, Value at Risk, and historical stress testing. The companion to the Equity Research Dashboard — one analyzes individual securities, this one manages risk across a portfolio.
 
 **Analytical Framework & Business Impact:**
