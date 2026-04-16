@@ -63,6 +63,9 @@ Multi-asset portfolio construction tool with Monte Carlo simulation, Value at Ri
 ### Quantitative Multifactor Strategy
 *Quantitative Investment Analysis | R, Fama-French Factors, Quantmod*
 
+#### Performance Preview
+![Growth of $1 invested](./Investment%20Strategy%20Project/graph_full_growth.png)
+
 **Analytical Framework & Business Impact:**
 
 | Feature | Technical Implementation | Business Impact |
