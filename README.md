@@ -60,6 +60,23 @@ Multi-asset portfolio construction tool with Monte Carlo simulation, Value at Ri
 *   **Full-History Stress Testing:** Engineered a separate data pipeline that fetches 25+ years of historical data specifically for stress testing, ensuring all 6 crisis scenarios produce results regardless of the analysis lookback period.
 *   **Comprehensive Risk Framework:** Implemented three independent VaR methodologies with color-coded risk classification, providing multiple perspectives on portfolio risk in a single view.
 
+### Quantitative Multifactor Strategy
+*Quantitative Investment Analysis | R, Fama-French Factors, Quantmod*
+
+**Analytical Framework & Business Impact:**
+
+| Feature | Technical Implementation | Business Impact |
+|:---|:---|:---|
+| **Factor Scoring** | Cross-sectional percentile ranking of Momentum, Value, Profitability, and Volatility | Systematically identifies securities with the strongest risk-adjusted characteristics |
+| **OOS Validation** | Strict 18-year out-of-sample forward-walk (2004–2022) | Eliminates look-ahead bias and verifies strategy resilience across multiple market cycles |
+| **Risk Anchoring** | Integrated Low-Volatility and Quality filters | Mechanically dampens drawdowns during tail-risk events compared to cap-weighted indices |
+| **FF6 Regression** | Statistical attribution via Fama-French 6-Factor model | Provides objective proof that returns are driven by intended factor exposures |
+
+**Key Achievements:**
+*   **Structurally Robust Performance:** Delivered consistent outperformance across both In-Sample (1970–2003) and Out-of-Sample (2004–2022) periods.
+*   **Enhanced Risk Efficiency:** Achieved a higher Sharpe ratio than the broad market in both testing phases (OOS Sharpe 0.70 vs. Market 0.59).
+*   **Downside Protection:** Demonstrated remarkably shallower drawdowns during major crises, including the 2008 Financial Crisis and 2020 COVID shock.
+
 ---
 
 ## What Each Project Signals
